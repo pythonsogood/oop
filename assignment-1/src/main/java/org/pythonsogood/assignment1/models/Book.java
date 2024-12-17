@@ -54,20 +54,22 @@ public class Book {
 	}
 
 	public void displayBookDetails() {
-		System.out.println(String.format("%d | %s | %s | %s", bookId, title, author, isAvailable ? "available" : "not available"));
+		System.out.println(String.format("%d | %s | %s | %s", this.getBookId(), this.getTitle(), this.getAuthor(), this.isAvailable() ? "available" : "not available"));
 	}
 
 	public void borrowBook() {
 		if (!isAvailable) {
-			throw new IllegalStateException("Book is not available now!");
+			throw new IllegalStateException(String.format("%s is not available now!", this.getTitle()));
 		}
 		this.setAvailable(false);
+		System.out.println(String.format("[%s] borrowed.", this.getTitle()));
 	}
 
 	public void returnBook() {
 		if (isAvailable) {
-			throw new IllegalStateException("Book is not borrowed!");
+			throw new IllegalStateException(String.format("%s is not borrowed!", this.getTitle()));
 		}
 		this.setAvailable(true);
+		System.out.println(String.format("[%s] returned.", this.getTitle()));
 	}
 }
