@@ -17,6 +17,7 @@ public class Assignment1 {
 		books.add(new Book(2, "Koshpendyler", "I. Esenberlin", random.nextBoolean()));
 		books.add(new Book(3, "Qara Sozder", "A. Kunanbaev", random.nextBoolean()));
 		books.add(new Book(4, "Qan men Ter", "A. Nurpeisov", random.nextBoolean()));
+		books.add(new Book(5, "Clean Code", "R. Martin", random.nextBoolean()));
 
 		boolean isAnyBookAvailable = false;
 		for (Book book : books) {
