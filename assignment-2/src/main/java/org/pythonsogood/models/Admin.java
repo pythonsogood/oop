@@ -1,9 +1,10 @@
 package org.pythonsogood.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Admin extends User {
-	private List<Product> products;
+	private List<Product> products = new ArrayList<>();
 
 	public Admin(int userId, String name, String email) {
         super(userId, name, email);
@@ -22,7 +23,7 @@ public class Admin extends User {
 	}
 
 	public void removeProduct(String productId) {
-        this.products.removeIf((Product product) -> (product.getProductId() == productId));
+        this.products.removeIf((Product product) -> (product.getProductId().equals(productId)));
     }
 
 	public void removeProduct(Product product) {
@@ -31,7 +32,7 @@ public class Admin extends User {
 
 	public void updateStock(String productId, int newStock) {
 		for (Product product : this.products) {
-			if (product.getProductId() == productId) {
+			if (product.getProductId().equals(productId)) {
 				product.setStock(newStock);
 			}
 		}
@@ -42,7 +43,7 @@ public class Admin extends User {
 	}
 
 	public void displayDetails() {
-		System.out.println(String.format("ID: %d | NAME: %s | EMAIL: %s", this.getUserId(), this.getName(), this.getEmail()));
+		System.out.println(String.format("ADMIN ID: %d | NAME: %s | EMAIL: %s", this.getUserId(), this.getName(), this.getEmail()));
 		System.out.println("Products:");
 		if (this.getProducts().isEmpty()) {
 			System.out.println("No products placed yet.");

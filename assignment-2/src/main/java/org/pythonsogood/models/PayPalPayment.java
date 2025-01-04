@@ -12,6 +12,6 @@ public class PayPalPayment {
 	}
 
 	public void processPayment(double amount) {
-		System.out.println(String.format("Processing PayPal payment for %d ₸", amount));
+		System.out.println(String.format("Processing PayPal payment for %f tenge", amount));
 	}
 }

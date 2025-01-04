@@ -1,9 +1,10 @@
 package org.pythonsogood.models;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Customer extends User {
-	private List<Order> orders;
+	private List<Order> orders = new ArrayList<>();
 	private String shippingAddress;
 
 	public Customer(int userId, String name, String email, String shippingAddress) {
@@ -34,7 +35,7 @@ public class Customer extends User {
 	}
 
 	public void displayDetails() {
-		System.out.println(String.format("ID: %d | NAME: %s | EMAIL: %s | SHIPPING ADDRESS: %s", this.getUserId(), this.getName(), this.getEmail(), this.getShippingAddress()));
+		System.out.println(String.format("CUSTOMER ID: %d | NAME: %s | EMAIL: %s | SHIPPING ADDRESS: %s", this.getUserId(), this.getName(), this.getEmail(), this.getShippingAddress()));
 		System.out.println("Orders:");
 		if (this.getOrders().isEmpty()) {
 			System.out.println("No orders placed yet.");

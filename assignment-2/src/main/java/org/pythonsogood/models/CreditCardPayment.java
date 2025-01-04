@@ -20,6 +20,6 @@ public class CreditCardPayment implements Payment {
     }
 
 	public void processPayment(double amount) {
-		System.out.println(String.format("Processing credit card payment for %d ₸", amount));
+		System.out.println(String.format("Processing credit card payment for %f tenge", amount));
 	}
 }

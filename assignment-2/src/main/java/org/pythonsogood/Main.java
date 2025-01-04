@@ -12,10 +12,10 @@ import org.pythonsogood.models.PayPalPayment;
 import org.pythonsogood.models.Product;
 
 public class Main {
-	public static ArrayList<Admin> admins = new ArrayList<Admin>();
-	public static ArrayList<Customer> customers = new ArrayList<Customer>();
-	public static HashMap<Integer, CreditCardPayment> payments_credit_cards = new HashMap<Integer, CreditCardPayment>();
-	public static HashMap<Integer, PayPalPayment> payments_paypal = new HashMap<Integer, PayPalPayment>();
+	public static ArrayList<Admin> admins = new ArrayList<>();
+	public static ArrayList<Customer> customers = new ArrayList<>();
+	public static HashMap<Integer, CreditCardPayment> payments_credit_cards = new HashMap<>();
+	public static HashMap<Integer, PayPalPayment> payments_paypal = new HashMap<>();
 	private static Random random = new Random();
 
     public static void main(String[] args) {
@@ -33,6 +33,8 @@ public class Main {
 		Product speaker = new Product("Speaker", 900, Main.random.nextInt(25, 50));
 		Product microphone = new Product("Microphone", 1300, Main.random.nextInt(25, 50));
 		Product phonecase = new Product("Phone case", 800, Main.random.nextInt(15, 30));
+
+		Product table = new Product("Table", 5000, Main.random.nextInt(15, 25));
 
 		admin.addProduct(apple);
 		admin.addProduct(potato);
@@ -73,13 +75,50 @@ public class Main {
 						CreditCardPayment payment = Main.getCustomerCreditCard(customer);
                         payment.processPayment(order.getTotalPrice());
 					}
+
+					order.completeOrder();
 				} catch (Exception e) {
 					System.out.println(String.format("Error creating order for customer %s: %s", customer.getName(), e.getMessage()));
 				}
 			}
 		}
 
-		admin.addProduct();
+		admin.addProduct(table);
+		admin.updateStock(pen.getProductId(), 0);
+		admin.removeProduct(pencil);
+
+		Customer random_customer = Main.customers.get(Main.random.nextInt(Main.customers.size()));
+		try {
+			Order order = new Order(random_customer, pen, 1);
+		} catch (Exception e) {
+			System.out.println(String.format("Error creating order for customer %s: %s", random_customer.getName(), e.getMessage()));
+		}
+
+		System.out.println("Customer list:");
+
+		for (Customer customer : Main.customers) {
+			customer.displayDetails();
+		}
+
+		System.out.println("Admin list:");
+
+		for (Admin _admin : Main.admins) {
+			_admin.displayDetails();
+		}
+
+		System.out.println("Product list:");
+
+		for (Product product : Main.getProducts()) {
+			product.displayDetails();
+		}
+
+		System.out.println("Order list:");
+
+		for (Customer customer : Main.customers) {
+			for (Order order : customer.getOrders()) {
+				order.displayOrderDetails();
+			}
+		}
     }
 
 	public static ArrayList<Product> getProducts() {

@@ -78,7 +78,11 @@ public class Order {
 		this.customer.cancelOrder(this);
 	}
 
+	public void completeOrder() {
+		this.status = OrderStatus.Completed;
+	}
+
 	public void displayOrderDetails() {
-		System.out.println(String.format("ID: %d | PRODUCT: %s | QUANTITY: %d | TOTAL PRICE: %d | STATUS: %s", this.getOrderId(), this.getProduct().getName(), this.getQuantity(), this.getTotalPrice(), this.getStatus()));
+		System.out.println(String.format("ORDER ID: %s | PRODUCT: %s | QUANTITY: %d | TOTAL PRICE: %f | STATUS: %s", this.getOrderId(), this.getProduct().getName(), this.getQuantity(), this.getTotalPrice(), this.getStatus()));
 	}
 }

@@ -59,6 +59,6 @@ public class Product {
     }
 
 	public void displayDetails() {
-		System.out.println(String.format("ID: %s | NAME: %s | PRICE: %f | STOCK: %d", this.getProductId(), this.getName(), this.getPrice(), this.getStock()));
+		System.out.println(String.format("PRODUCT ID: %s | NAME: %s | PRICE: %f | STOCK: %d", this.getProductId(), this.getName(), this.getPrice(), this.getStock()));
 	}
 }

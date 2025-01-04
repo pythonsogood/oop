@@ -31,7 +31,5 @@ public class User {
         return email;
     }
 
-	public void displayDetails() {
-		System.out.println(String.format("ID: %d | NAME: %s | EMAIL: %s", this.getUserId(), this.getName(), this.getEmail()));
-	}
+	public void displayDetails() {}
 }
