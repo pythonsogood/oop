@@ -20,10 +20,6 @@ public class Customer extends User {
         return orders;
     }
 
-	public void setOrders(List<Order> orders) {
-        this.orders = orders;
-    }
-
 	public String getShippingAddress() {
         return shippingAddress;
     }

@@ -69,11 +69,13 @@ public class Order {
 	private void placeOrder() {
 		this.getProduct().reduceStock();
 		this.status = OrderStatus.Placed;
+		this.customer.placeOrder(this);
 	}
 
 	public void cancelOrder() {
 		this.getProduct().increaseStock();
 		this.status = OrderStatus.Cancelled;
+		this.customer.cancelOrder(this);
 	}
 
 	public void displayOrderDetails() {
