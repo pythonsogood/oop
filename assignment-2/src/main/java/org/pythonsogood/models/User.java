@@ -2,7 +2,7 @@ package org.pythonsogood.models;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class User {
+public abstract class User {
 	static AtomicInteger userIdGenerator = new AtomicInteger(0);
 
 	private int userId;
