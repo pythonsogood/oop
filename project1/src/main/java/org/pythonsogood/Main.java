@@ -1,26 +1,20 @@
 package org.pythonsogood;
 
+import org.pythonsogood.repositories.UserRepository;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-import org.json.JSONObject;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
 
 @SpringBootApplication
-@RestController
-public class Main {
-	private Similarity similarity = new Similarity();
-
+@ComponentScan
+@EnableAutoConfiguration
+@EnableMongoRepositories(basePackageClasses = UserRepository.class)
+public class Main extends SpringBootServletInitializer {
     public static void main(String[] args) {
 		SpringApplication.run(Main.class, args);
     }
-
-	@PostMapping("/similarity")
-	public String similarity(@RequestParam(value = "s1", required = true) String s1, @RequestParam(value = "s2", required = true) String s2) {
-		double score = this.similarity.similarity(s1, s2);
-		return String.format("{\"score\": %f}", score);
-	}
 }
