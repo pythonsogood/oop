@@ -3,6 +3,9 @@
 
 # Java
 
+# Sensitive info
+*/src/main/resources/*.properties
+
 # Compiled class file
 */*.class
 
