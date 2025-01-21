@@ -20,11 +20,11 @@ public class User {
 	private String email;
 	private ArrayList<String> cars;
 
-	public User(String username, String password, String email) {
+	public User(String username, String password_hash, String email) {
 		this.username = username;
         this.email = email;
+		this.password_hash = password_hash;
         this.cars = new ArrayList<>();
-		this.setPassword(password);
 	}
 
 	public ObjectId getId() {
@@ -48,8 +48,12 @@ public class User {
 	}
 
 	public void setPassword(String password) {
+		this.setPasswordHash(User.hashPassword(password));
+	}
+
+	static public String hashPassword(String password) {
 		String password_hash = User.bCrypt.hashToString(12, password.toCharArray());
-		this.setPasswordHash(password_hash);
+		return password_hash;
 	}
 
 	public BCrypt.Result verifyPassword(String password) {
