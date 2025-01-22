@@ -1,12 +1,15 @@
-package org.pythonsogood.Models;
+package org.pythonsogood.model;
 
 import java.util.ArrayList;
 
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotEmpty;
 
 @Document("users")
 public class User {
@@ -15,8 +18,10 @@ public class User {
 
 	@Id
 	private ObjectId id;
+	@Indexed(unique = true)
 	private String username;
 	private String password_hash;
+	@Indexed(unique = true)
 	private String email;
 	private ArrayList<String> cars;
 
