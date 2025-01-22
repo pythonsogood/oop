@@ -9,13 +9,11 @@ import lombok.Data;
 public class UserLoginDTO {
 	@Valid
 
+	@NotNull
+	@NotBlank
 	private String username;
 
 	@NotNull
 	@NotBlank
 	private String password;
-
-	public boolean hasUsername() {
-		return this.username != null && this.username.length() > 0;
-	}
 }
