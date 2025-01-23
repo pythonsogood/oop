@@ -25,15 +25,15 @@ public class User {
 	static private final BCrypt.Verifyer bCryptVerifier = BCrypt.verifyer();
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String username;
 	private String password_hash;
 	private String email;
 
-	public User(String username, String password, String email) {
+	public User(String username, String password_hash, String email) {
 		this.setUsername(username);
-		this.setPassword(password);
+		this.setPassword_hash(password_hash);
 		this.setEmail(email);
 	}
 
@@ -42,10 +42,12 @@ public class User {
 	}
 
 	static public String hashPassword(String password) {
+		System.out.println(String.format("PASS: %s", password));
 		return User.bCrypt.hashToString(12, password.toCharArray());
 	}
 
 	public BCrypt.Result verifyPassword(String password) {
+		System.out.println(String.format("CHECK: %s", password));
 		return User.bCryptVerifier.verify(password.toCharArray(), this.password_hash);
 	}
 }
