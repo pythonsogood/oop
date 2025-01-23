@@ -1,16 +1,12 @@
 package org.pythonsogood.repository;
 
-import org.bson.types.ObjectId;
+import java.util.List;
+
 import org.pythonsogood.model.User;
-import org.springframework.data.mongodb.repository.MongoRepository;
-import org.springframework.data.mongodb.repository.Query;
-import org.springframework.stereotype.Repository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public interface UserRepository extends MongoRepository<User, ObjectId> {
-	@Query("{username:'?0'}")
-	User findByUsername(String username);
+public interface UserRepository extends JpaRepository<User, Long> {
+	List<User> findByUsername(String username);
 
-	@Query("{email:'?0'}")
-	User findByEmail(String email);
+	List<User> findByEmail(String email);
 }

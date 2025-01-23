@@ -2,63 +2,47 @@ package org.pythonsogood.model;
 
 import java.util.ArrayList;
 
-import org.bson.types.ObjectId;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
-
 import at.favre.lib.crypto.bcrypt.BCrypt;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotEmpty;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
-@Document("users")
+@NoArgsConstructor
+@AllArgsConstructor
+@Data
+@Entity
+@Table(name = "users", indexes = {
+	@Index(columnList = "id, username, email", unique = true)
+})
 public class User {
 	static private final BCrypt.Hasher bCrypt = BCrypt.withDefaults();
 	static private final BCrypt.Verifyer bCryptVerifier = BCrypt.verifyer();
 
 	@Id
-	private ObjectId id;
-	@Indexed(unique = true)
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Long id;
 	private String username;
 	private String password_hash;
-	@Indexed(unique = true)
 	private String email;
-	private ArrayList<String> cars;
 
-	public User(String username, String password_hash, String email) {
-		this.username = username;
-        this.email = email;
-		this.password_hash = password_hash;
-        this.cars = new ArrayList<>();
-	}
-
-	public ObjectId getId() {
-        return id;
-    }
-
-	public String getUsername() {
-        return username;
-    }
-
-	public String getEmail() {
-		return email;
-	}
-
-	public String getPasswordHash() {
-		return password_hash;
-	}
-
-	private void setPasswordHash(String password_hash) {
-		this.password_hash = password_hash;
+	public User(String username, String password, String email) {
+		this.setUsername(username);
+		this.setPassword(password);
+		this.setEmail(email);
 	}
 
 	public void setPassword(String password) {
-		this.setPasswordHash(User.hashPassword(password));
+		this.setPassword_hash(User.hashPassword(password));
 	}
 
 	static public String hashPassword(String password) {
-		String password_hash = User.bCrypt.hashToString(12, password.toCharArray());
-		return password_hash;
+		return User.bCrypt.hashToString(12, password.toCharArray());
 	}
 
 	public BCrypt.Result verifyPassword(String password) {
