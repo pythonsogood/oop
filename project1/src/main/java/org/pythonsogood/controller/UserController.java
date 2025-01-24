@@ -23,24 +23,18 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 
 import at.favre.lib.crypto.bcrypt.BCrypt;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/user")
 public class UserController extends AbstractRestController {
 	private final UserService userService;
 
 	@Autowired
 	private Algorithm userAuthorizationJwtAlgorithm;
-
-	@Autowired
-	private JWTVerifier userAuthorizationJwtVerifier;
 
 	@Value("${user.authorization.jwt.duration}")
 	protected Integer userAuthorizationJwtDuration;
@@ -50,12 +44,12 @@ public class UserController extends AbstractRestController {
 	}
 
 	@RequestMapping(value="/register", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> users_register(@Valid @RequestBody UserRegistrationDTO user_dto) throws UserAlreadyExistsException {
-		Optional<User> existing_user = this.userService.findByUsername(user_dto.getUsername());
+	public ResponseEntity<Object> users_register(@Valid @RequestBody UserRegistrationDTO dto) throws UserAlreadyExistsException {
+		Optional<User> existing_user = this.userService.findByUsername(dto.getUsername());
 		if (existing_user.isPresent()) {
-			throw new UserAlreadyExistsException(String.format("User %s already exists", user_dto.getUsername()));
+			throw new UserAlreadyExistsException(String.format("User %s already exists", dto.getUsername()));
 		}
-		User user = new User(user_dto.getUsername(), User.hashPassword(user_dto.getPassword()), user_dto.getEmail());
+		User user = new User(dto.getUsername(), User.hashPassword(dto.getPassword()), dto.getEmail());
 		this.userService.save(user);
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
@@ -63,13 +57,13 @@ public class UserController extends AbstractRestController {
 	}
 
 	@RequestMapping(value="/login", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<Object> users_register(@Valid @RequestBody(required=true) UserLoginDTO user_dto) throws UserNotFoundException, BadCredentialsException {
-		Optional<User> userOptional = this.userService.findByUsername(user_dto.getUsername());
+	public ResponseEntity<Object> users_register(@Valid @RequestBody(required=true) UserLoginDTO dto) throws UserNotFoundException, BadCredentialsException {
+		Optional<User> userOptional = this.userService.findByUsername(dto.getUsername());
 		if (!userOptional.isPresent()) {
-			throw new UserNotFoundException(String.format("User %s not found", user_dto.getUsername()));
+			throw new UserNotFoundException(String.format("User %s not found", dto.getUsername()));
 		}
 		User user = userOptional.get();
-		BCrypt.Result password_result = user.verifyPassword(user_dto.getPassword());
+		BCrypt.Result password_result = user.verifyPassword(dto.getPassword());
 		if (!password_result.verified) {
 			throw new BadCredentialsException("Invalid password");
 		}
@@ -82,19 +76,9 @@ public class UserController extends AbstractRestController {
 
 	@RequestMapping(value="/whoami", method={RequestMethod.GET}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> users_whoami(@RequestParam(value="token", required=true) String token) throws BadCredentialsException {
-		User user = this.authorize(token);
+		User user = this.userService.authorize(token);
 		JSONObject response = new JSONObject();
 		response.put("username", user.getUsername());
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
-	}
-
-	public User authorize(String token) throws BadCredentialsException {
-		try {
-			DecodedJWT jwt = this.userAuthorizationJwtVerifier.verify(token);
-			Long user_id = Long.parseLong(jwt.getSubject());
-			return this.userService.findById(user_id).orElseThrow(() -> new BadCredentialsException("user not found"));
-		} catch (JWTVerificationException e) {
-			throw new BadCredentialsException(e.getMessage());
-		}
 	}
 }

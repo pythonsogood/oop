@@ -2,27 +2,34 @@ package org.pythonsogood.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.pythonsogood.exceptions.BadCredentialsException;
 import org.pythonsogood.model.User;
 import org.pythonsogood.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class UserService {
 	@Autowired
 	private final UserRepository userRepository;
+
+	@Autowired
+	private JWTVerifier userAuthorizationJwtVerifier;
 
 	public List<User> findAll() {
 		return this.userRepository.findAll();
 	}
 
-	public Optional<User> findById(Long id) {
+	public Optional<User> findById(UUID id) {
 		return this.userRepository.findById(id);
 	}
 
@@ -38,5 +45,23 @@ public class UserService {
 
 	public User save(User user) {
 		return this.userRepository.save(user);
+	}
+
+	public void delete(User user) {
+		this.userRepository.delete(user);
+	}
+
+	public void deleteById(UUID id) {
+		this.userRepository.deleteById(id);
+	}
+
+	public User authorize(String token) throws BadCredentialsException {
+		try {
+			DecodedJWT jwt = this.userAuthorizationJwtVerifier.verify(token);
+			String user_id = jwt.getSubject();
+			return this.findById(UUID.fromString(user_id)).orElseThrow(() -> new BadCredentialsException("user not found"));
+		} catch (JWTVerificationException e) {
+			throw new BadCredentialsException(e.getMessage());
+		}
 	}
 }
