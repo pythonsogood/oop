@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.json.JSONObject;
 import org.pythonsogood.dto.UserLoginDTO;
 import org.pythonsogood.dto.UserRegistrationDTO;
+import org.pythonsogood.dto.UserSetBalanceDTO;
 import org.pythonsogood.exceptions.BadCredentialsException;
 import org.pythonsogood.exceptions.UserAlreadyExistsException;
 import org.pythonsogood.exceptions.UserNotFoundException;
@@ -31,7 +32,8 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/user")
 public class UserController extends AbstractRestController {
-	private final UserService userService;
+	@Value("${user.authorization.admin_token}")
+	private String userAuthorizationAdminToken;
 
 	@Autowired
 	private Algorithm userAuthorizationJwtAlgorithm;
@@ -39,9 +41,8 @@ public class UserController extends AbstractRestController {
 	@Value("${user.authorization.jwt.duration}")
 	protected Integer userAuthorizationJwtDuration;
 
-	public UserController(final UserService userService) {
-		this.userService = userService;
-	}
+	@Autowired
+	private UserService userService;
 
 	@RequestMapping(value="/register", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> users_register(@Valid @RequestBody UserRegistrationDTO dto) throws UserAlreadyExistsException {
@@ -79,6 +80,24 @@ public class UserController extends AbstractRestController {
 		User user = this.userService.authorize(token);
 		JSONObject response = new JSONObject();
 		response.put("username", user.getUsername());
+		response.put("balance", user.getBalance());
+		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
+	}
+
+	@RequestMapping(value="/set-balance", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> users_set_balance(@Valid @RequestBody(required=true) UserSetBalanceDTO dto) throws BadCredentialsException, UserNotFoundException {
+		if (!dto.getToken().equals(this.userAuthorizationAdminToken)) {
+			throw new BadCredentialsException("Invalid token");
+		}
+		Optional<User> userOptional = this.userService.findByUsername(dto.getUsername());
+		if (!userOptional.isPresent()) {
+			throw new UserNotFoundException(String.format("User %s not found", dto.getUsername()));
+		}
+		User user = userOptional.get();
+		user.setBalance(dto.getBalance());
+		this.userService.save(user);
+		JSONObject response = new JSONObject();
+		response.put("message", "success");
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 }

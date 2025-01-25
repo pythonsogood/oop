@@ -2,9 +2,9 @@ package org.pythonsogood.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.pythonsogood.model.Product;
+import org.pythonsogood.model.User;
 import org.pythonsogood.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class ProductService {
 		return this.productRepository.findAll();
 	}
 
-	public Optional<Product> findById(UUID id) {
+	public Optional<Product> findById(Long id) {
 		return this.productRepository.findById(id);
 	}
 
@@ -32,6 +32,7 @@ public class ProductService {
 	}
 
 	public Product save(Product product) {
+		System.out.println(String.format("SAVING PRODUCT WITH ID: %s", product.getProduct_id()));
 		return this.productRepository.save(product);
 	}
 
@@ -39,7 +40,19 @@ public class ProductService {
 		this.productRepository.delete(product);
 	}
 
-	public void deleteById(UUID id) {
+	public void deleteById(Long id) {
 		this.productRepository.deleteById(id);
+	}
+
+	public Double countUserCart(User user) {
+		Double total = 0.0;
+		for (Long product_id : user.getCart()) {
+			Optional<Product> productOptional = this.findById(product_id);
+			if (productOptional.isPresent()) {
+				Product product = productOptional.get();
+				total += product.getPrice();
+			}
+		}
+		return total;
 	}
 }

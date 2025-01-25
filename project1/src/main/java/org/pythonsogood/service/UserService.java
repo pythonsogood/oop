@@ -2,7 +2,6 @@ package org.pythonsogood.service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.pythonsogood.exceptions.BadCredentialsException;
 import org.pythonsogood.model.User;
@@ -29,7 +28,7 @@ public class UserService {
 		return this.userRepository.findAll();
 	}
 
-	public Optional<User> findById(UUID id) {
+	public Optional<User> findById(Long id) {
 		return this.userRepository.findById(id);
 	}
 
@@ -51,15 +50,15 @@ public class UserService {
 		this.userRepository.delete(user);
 	}
 
-	public void deleteById(UUID id) {
+	public void deleteById(Long id) {
 		this.userRepository.deleteById(id);
 	}
 
 	public User authorize(String token) throws BadCredentialsException {
 		try {
 			DecodedJWT jwt = this.userAuthorizationJwtVerifier.verify(token);
-			String user_id = jwt.getSubject();
-			return this.findById(UUID.fromString(user_id)).orElseThrow(() -> new BadCredentialsException("user not found"));
+			Long user_id = Long.parseLong(jwt.getSubject());
+			return this.findById(user_id).orElseThrow(() -> new BadCredentialsException("user not found"));
 		} catch (JWTVerificationException e) {
 			throw new BadCredentialsException(e.getMessage());
 		}

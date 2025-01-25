@@ -2,15 +2,17 @@ package org.pythonsogood.controller;
 
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.json.JSONObject;
 import org.pythonsogood.dto.StoreCartDeleteDTO;
 import org.pythonsogood.dto.StoreCartPutDTO;
+import org.pythonsogood.dto.StorePayDTO;
 import org.pythonsogood.dto.StoreProductPutDTO;
 import org.pythonsogood.exceptions.BadCredentialsException;
+import org.pythonsogood.exceptions.NotEnoughBalanceException;
 import org.pythonsogood.exceptions.ProductAlreadyExistsException;
 import org.pythonsogood.exceptions.ProductNotFoundException;
+import org.pythonsogood.exceptions.RequestException;
 import org.pythonsogood.model.Product;
 import org.pythonsogood.model.User;
 import org.pythonsogood.service.ProductService;
@@ -43,12 +45,13 @@ public class StoreController extends AbstractRestController {
 	@RequestMapping(value="/cart", method={RequestMethod.PUT}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> cart_put(@Valid @RequestBody StoreCartPutDTO dto) throws BadCredentialsException, ProductNotFoundException {
 		User user = this.userService.authorize(dto.getToken());
-		Optional<Product> productOptional = this.productService.findById(UUID.fromString(dto.getProduct_id()));
+		Optional<Product> productOptional = this.productService.findById(Long.parseLong(dto.getProduct_id()));
 		if (!productOptional.isPresent()) {
 			throw new ProductNotFoundException(String.format("Product %d not found", dto.getProduct_id()));
 		}
 		Product product = productOptional.get();
 		user.addToCart(product.getProduct_id());
+		this.userService.save(user);
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
@@ -57,7 +60,7 @@ public class StoreController extends AbstractRestController {
 	@RequestMapping(value="/cart", method={RequestMethod.DELETE}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> cart_delete(@Valid @RequestBody StoreCartDeleteDTO dto) throws BadCredentialsException, ProductNotFoundException {
 		User user = this.userService.authorize(dto.getToken());
-		Optional<Product> productOptional = this.productService.findById(UUID.fromString(dto.getProduct_id()));
+		Optional<Product> productOptional = this.productService.findById(Long.parseLong(dto.getProduct_id()));
 		if (!productOptional.isPresent()) {
 			throw new ProductNotFoundException(String.format("Product %d not found", dto.getProduct_id()));
 		}
@@ -66,6 +69,7 @@ public class StoreController extends AbstractRestController {
 			throw new ProductNotFoundException(String.format("Product %d not in cart", dto.getProduct_id()));
 		}
 		user.removeFromCart(product.getProduct_id());
+		this.userService.save(user);
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
@@ -77,7 +81,7 @@ public class StoreController extends AbstractRestController {
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
 		ArrayList<String> products = new ArrayList<>();
-		for (UUID product_id : user.getCart()) {
+		for (Long product_id : user.getCart()) {
 			Optional<Product> productOptional = this.productService.findById(product_id);
 			if (productOptional.isPresent()) {
 				Product product = productOptional.get();
@@ -85,6 +89,32 @@ public class StoreController extends AbstractRestController {
 			}
 		}
 		response.put("cart", products);
+		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
+	}
+
+	@RequestMapping(value="/pay", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> cart_pay(@Valid @RequestBody(required=true) StorePayDTO dto) throws BadCredentialsException, NotEnoughBalanceException, RequestException {
+		User user = this.userService.authorize(dto.getToken());
+		if (user.getCart().size() <= 0) {
+			throw new RequestException("Cart is empty");
+		}
+		Double cost = this.productService.countUserCart(user);
+		if (user.getBalance() < cost) {
+			throw new NotEnoughBalanceException("Not enough balance");
+		}
+		JSONObject response = new JSONObject();
+		response.put("message", "success");
+		ArrayList<String> products = new ArrayList<>();
+		for (Long product_id : user.getCart()) {
+			Optional<Product> productOptional = this.productService.findById(product_id);
+			if (productOptional.isPresent()) {
+				Product product = productOptional.get();
+				products.add(product.getName());
+			}
+		}
+		user.setBalance(user.getBalance() - cost);
+		user.clearCart();
+		this.userService.save(user);
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
@@ -126,11 +156,11 @@ public class StoreController extends AbstractRestController {
 		if (!dto.getToken().equals(this.storeAuthorizationAdminToken)) {
 			throw new BadCredentialsException("Invalid token");
 		}
-		Optional<Product> productOptional = this.productService.findById(UUID.fromString(dto.getProduct_id()));
+		Optional<Product> productOptional = this.productService.findById(Long.parseLong(dto.getProduct_id()));
 		if (!productOptional.isPresent()) {
 			throw new ProductNotFoundException(String.format("Product %d not found", dto.getProduct_id()));
 		}
-		this.productService.deleteById(UUID.fromString(dto.getProduct_id()));
+		this.productService.deleteById(Long.parseLong(dto.getProduct_id()));
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
