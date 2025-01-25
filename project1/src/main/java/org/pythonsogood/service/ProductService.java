@@ -32,7 +32,6 @@ public class ProductService {
 	}
 
 	public Product save(Product product) {
-		System.out.println(String.format("SAVING PRODUCT WITH ID: %s", product.getProduct_id()));
 		return this.productRepository.save(product);
 	}
 

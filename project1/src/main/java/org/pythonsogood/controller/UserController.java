@@ -50,10 +50,13 @@ public class UserController extends AbstractRestController {
 		if (existing_user.isPresent()) {
 			throw new UserAlreadyExistsException(String.format("User %s already exists", dto.getUsername()));
 		}
+
 		User user = new User(dto.getUsername(), User.hashPassword(dto.getPassword()), dto.getEmail());
 		this.userService.save(user);
+
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
+
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
@@ -63,24 +66,30 @@ public class UserController extends AbstractRestController {
 		if (!userOptional.isPresent()) {
 			throw new UserNotFoundException(String.format("User %s not found", dto.getUsername()));
 		}
+
 		User user = userOptional.get();
+
 		BCrypt.Result password_result = user.verifyPassword(dto.getPassword());
 		if (!password_result.verified) {
 			throw new BadCredentialsException("Invalid password");
 		}
+
 		JSONObject response = new JSONObject();
 		Date now = new Date();
 		String token = JWT.create().withExpiresAt(new Date(now.getTime() + (this.userAuthorizationJwtDuration * 1000))).withSubject(user.getId().toString()).sign(this.userAuthorizationJwtAlgorithm);
 		response.put("token", token);
+
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
 	@RequestMapping(value="/whoami", method={RequestMethod.GET}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> users_whoami(@RequestParam(value="token", required=true) String token) throws BadCredentialsException {
 		User user = this.userService.authorize(token);
+
 		JSONObject response = new JSONObject();
 		response.put("username", user.getUsername());
 		response.put("balance", user.getBalance());
+
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 
@@ -89,15 +98,19 @@ public class UserController extends AbstractRestController {
 		if (!dto.getToken().equals(this.userAuthorizationAdminToken)) {
 			throw new BadCredentialsException("Invalid token");
 		}
+
 		Optional<User> userOptional = this.userService.findByUsername(dto.getUsername());
 		if (!userOptional.isPresent()) {
 			throw new UserNotFoundException(String.format("User %s not found", dto.getUsername()));
 		}
+
 		User user = userOptional.get();
 		user.setBalance(dto.getBalance());
 		this.userService.save(user);
+
 		JSONObject response = new JSONObject();
 		response.put("message", "success");
+
 		return ResponseEntity.status(HttpStatus.OK).body(response.toString());
 	}
 }
