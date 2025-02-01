@@ -4,7 +4,7 @@ Online shopping backend service written with [Spring Boot](https://spring.io/pro
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/license/mit/)
 
-## [application.properties](/src/main/resources/application.properties) structure
+## [application.properties](/project1/src/main/resources/application.properties) structure
 | Key | Description |
 | --- | --- |
 | user.authorization.jwt.secret | Secret key for JWT verification in user authorization |
