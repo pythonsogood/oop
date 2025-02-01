@@ -3,7 +3,7 @@ package org.pythonsogood.exceptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 
-public class RequestException extends Exception {
+public class RequestException extends Exception implements HTTPException {
 	private HttpStatusCode httpStatusCode = HttpStatus.BAD_REQUEST;
 	private String detail;
 

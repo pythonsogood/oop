@@ -13,7 +13,7 @@ import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class AbstractRestController {
 	@ExceptionHandler(RequestException.class)
-	public ResponseEntity<Object> handleReqiestException(HttpServletRequest req, RequestException ex) {
+	public ResponseEntity<Object> handleRequestException(HttpServletRequest req, RequestException ex) {
 		JSONObject response = new JSONObject();
 		response.put("message", ex.getMessage());
 
