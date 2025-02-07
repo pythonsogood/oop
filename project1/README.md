@@ -14,4 +14,5 @@ Online shopping backend service written with [Spring Boot](https://spring.io/pro
 | spring.datasource.url | Connection url for PostreSQL database `jdbc:postgresql://host:port/database_name` |
 | spring.datasource.username | Database username |
 | spring.datasource.password | Database user password |
+| spring.jpa.generate-ddl | Must be set to `true` for correct work |
 | spring.jpa.hibernate.ddl-auto | Must be set to `update` for correct work |
