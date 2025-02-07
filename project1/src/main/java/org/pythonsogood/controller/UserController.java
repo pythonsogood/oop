@@ -44,6 +44,11 @@ public class UserController extends AbstractRestController {
 	@Autowired
 	private UserService userService;
 
+	@Override
+	public String getControllerName() {
+		return "User";
+	}
+
 	@RequestMapping(value="/register", method={RequestMethod.POST}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> users_register(@Valid @RequestBody UserRegistrationDTO dto) throws UserAlreadyExistsException {
 		Optional<User> existing_user = this.userService.findByUsername(dto.getUsername());

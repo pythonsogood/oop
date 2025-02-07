@@ -45,6 +45,11 @@ public class StoreController extends AbstractRestController {
 	@Autowired
 	private ProductService productService;
 
+	@Override
+	public String getControllerName() {
+		return "Store";
+	}
+
 	@RequestMapping(value="/cart", method={RequestMethod.PUT}, produces=MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> cart_put(@Valid @RequestBody StoreCartPutDTO dto) throws BadCredentialsException, ProductNotFoundException {
 		User user = this.userService.authorize(dto.getToken());

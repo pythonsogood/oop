@@ -12,10 +12,15 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import jakarta.servlet.http.HttpServletRequest;
 
 public abstract class AbstractRestController {
+	public String getControllerName() {
+		return this.getClass().getName();
+	}
+
 	@ExceptionHandler(RequestException.class)
 	public ResponseEntity<Object> handleRequestException(HttpServletRequest req, RequestException ex) {
 		JSONObject response = new JSONObject();
 		response.put("message", ex.getMessage());
+		response.put("controller", this.getControllerName());
 
 		String detail = ex.getDetail();
 		if (detail != null) {
